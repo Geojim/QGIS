@@ -413,7 +413,8 @@ void QgsMssqlProvider::loadFields()
   QSqlQuery query = createQuery();
   query.setForwardOnly( true );
 
-  const QString sql { QStringLiteral( "SELECT name FROM sys.columns WHERE is_computed = 1 AND object_id = OBJECT_ID('[%1].[%2]')" ).arg( mSchemaName, mTableName ) };
+  const QString qualifiedTableNameForObjectId = quotedIdentifier(mSchemaName) + QLatin1String(".") + quotedIdentifier(mTableName);
+  const QString sql = QStringLiteral( "SELECT name FROM sys.columns WHERE is_computed = 1 AND object_id = OBJECT_ID(%1)" ).arg( quotedValue( qualifiedTableNameForObjectId ) );
 
   // Get computed columns which need to be ignored on insert or update.
   if ( !LoggedExec( query, sql ) )
@@ -662,7 +663,9 @@ QString QgsMssqlProvider::quotedValue( const QVariant &value )
 
 QString QgsMssqlProvider::quotedIdentifier( const QString &value )
 {
-  return QStringLiteral( "[%1]" ).arg( value );
+  QString escapedValue = value;
+  escapedValue.replace( QLatin1String( "]" ), QLatin1String( "]]" ) );
+  return QStringLiteral( "[%1]" ).arg( escapedValue );
 }
 
 QString QgsMssqlProvider::defaultValueClause( int fieldId ) const
@@ -952,10 +955,10 @@ void QgsMssqlProvider::UpdateStatistics( bool estimate ) const
 
   // Get the extents from the spatial index table to speed up load times.
   // We have to use max() and min() because you can have more then one index but the biggest area is what we want to use.
-  const QString sql = "SELECT min(bounding_box_xmin), min(bounding_box_ymin), max(bounding_box_xmax), max(bounding_box_ymax)"
-                      " FROM sys.spatial_index_tessellations WHERE object_id = OBJECT_ID('[%1].[%2]')";
-
-  statement = QString( sql ).arg( mSchemaName, mTableName );
+  const QString qualifiedTableNameForObjectId = quotedIdentifier(mSchemaName) + QLatin1String(".") + quotedIdentifier(mTableName);
+  const QString sql_template = QStringLiteral("SELECT min(bounding_box_xmin), min(bounding_box_ymin), max(bounding_box_xmax), max(bounding_box_ymax)"
+                                " FROM sys.spatial_index_tessellations WHERE object_id = OBJECT_ID(%1)");
+  statement = sql_template.arg(quotedValue(qualifiedTableNameForObjectId));
 
   if ( LoggedExec( query, statement ) )
   {
