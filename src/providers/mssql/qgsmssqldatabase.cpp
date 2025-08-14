@@ -180,7 +180,8 @@ bool QgsMssqlDatabase::loadFields( FieldDetails &details, const QString &schema,
   QSqlQuery query = createQuery();
   query.setForwardOnly( true );
 
-  const QString sql { QStringLiteral( "SELECT name FROM sys.columns WHERE is_computed = 1 AND object_id = OBJECT_ID('[%1].[%2]')" ).arg( schema, tableName ) };
+  const QString qualifiedName = QStringLiteral( "%1.%2" ).arg( QgsMssqlUtils::quotedIdentifier( schema ), QgsMssqlUtils::quotedIdentifier( tableName ) );
+  const QString sql { QStringLiteral( "SELECT name FROM sys.columns WHERE is_computed = 1 AND object_id = OBJECT_ID(%1)" ).arg( QgsMssqlUtils::quotedValue( qualifiedName ) ) };
 
   // Get computed columns which need to be ignored on insert or update.
   if ( !LoggedExec( query, sql ) )

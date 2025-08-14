@@ -38,16 +38,15 @@ QString QgsMssqlUtils::quotedValue( const QVariant &value )
     case QMetaType::Type::QString:
       QString v = value.toString();
       v.replace( '\'', QLatin1String( "''" ) );
-      if ( v.contains( '\\' ) )
-        return v.replace( '\\', QLatin1String( "\\\\" ) ).prepend( "N'" ).append( '\'' );
-      else
-        return v.prepend( "N'" ).append( '\'' );
+      return v.prepend( "N'" ).append( ''' );
   }
 }
 
 QString QgsMssqlUtils::quotedIdentifier( const QString &value )
 {
-  return QStringLiteral( "[%1]" ).arg( value );
+  QString result = value;
+  result.replace( ']', "]]" );
+  return QStringLiteral( "[%1]" ).arg( result );
 }
 
 QMetaType::Type QgsMssqlUtils::convertSqlFieldType( const QString &systemTypeName )
