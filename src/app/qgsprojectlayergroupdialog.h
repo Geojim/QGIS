@@ -74,6 +74,19 @@ class APP_EXPORT QgsProjectLayerGroupDialog : public QDialog, private Ui::QgsPro
     ~QgsProjectLayerGroupDialog() override;
 
     QStringList selectedGroups() const;
+
+    /**
+     * Returns the hierarchical paths of the selected groups.
+     *
+     * Each path is a list of (group name, occurrence index) pairs describing
+     * the navigation from the root of the layer tree to the selected group.
+     * The occurrence index is the 0-based position among same-named sibling
+     * groups at each level.
+     *
+     * \since QGIS 3.44
+     */
+    QList<QList<QPair<QString, int>>> selectedGroupPaths() const;
+
     QStringList selectedLayerIds() const;
     QStringList selectedLayerNames() const;
     QString selectedProjectFile() const;

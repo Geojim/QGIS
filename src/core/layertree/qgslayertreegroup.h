@@ -265,6 +265,20 @@ class CORE_EXPORT QgsLayerTreeGroup : public QgsLayerTreeNode
     QgsLayerTreeGroup *findGroup( const QString &name );
 
     /**
+     * Find a group node by navigating a hierarchical path from this node.
+     *
+     * Each element in the \a path is a pair of (group name, occurrence index) where
+     * the occurrence index is the 0-based position among same-named non-embedded
+     * sibling groups at each level. This allows unambiguous identification of groups
+     * even when multiple groups share the same name.
+     *
+     * Returns NULLPTR if the path cannot be resolved.
+     *
+     * \since QGIS 3.44
+     */
+    QgsLayerTreeGroup *findGroupByPath( const QList<QPair<QString, int>> &path );
+
+    /**
      * Find group layer nodes. Searches recursively the whole sub-tree, if recursive is set.
     */
     QList<QgsLayerTreeGroup *> findGroups( bool recursive = false ) const;

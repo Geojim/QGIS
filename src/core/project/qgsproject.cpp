@@ -4207,6 +4207,82 @@ std::unique_ptr<QgsLayerTreeGroup> QgsProject::createEmbeddedGroup( const QStrin
   return newGroup;
 }
 
+std::unique_ptr<QgsLayerTreeGroup> QgsProject::createEmbeddedGroup( const QList<QPair<QString, int>> &groupPath, const QString &projectFilePath, const QStringList &invisibleLayers, Qgis::ProjectReadFlags flags )
+{
+  QGIS_PROTECT_QOBJECT_THREAD_ACCESS
+
+  QString qgsProjectFile = projectFilePath;
+  QgsProjectArchive archive;
+  if ( projectFilePath.endsWith( ".qgz"_L1, Qt::CaseInsensitive ) )
+  {
+    archive.unzip( projectFilePath );
+    qgsProjectFile = archive.projectFile();
+  }
+
+  // open project file, get layer ids in group, add the layers
+  QFile projectFile( qgsProjectFile );
+  if ( !projectFile.open( QIODevice::ReadOnly ) )
+  {
+    return nullptr;
+  }
+
+  QDomDocument projectDocument;
+  if ( !projectDocument.setContent( &projectFile ) )
+  {
+    return nullptr;
+  }
+
+  QgsReadWriteContext context;
+  context.setPathResolver( pathResolver() );
+  context.setProjectTranslator( this );
+  context.setTransformContext( transformContext() );
+
+  auto root = std::make_unique< QgsLayerTreeGroup >();
+
+  QDomElement layerTreeElem = projectDocument.documentElement().firstChildElement( u"layer-tree-group"_s );
+  if ( !layerTreeElem.isNull() )
+  {
+    root->readChildrenFromXml( layerTreeElem, context );
+  }
+  else
+  {
+    QgsLayerTreeUtils::readOldLegend( root.get(), projectDocument.documentElement().firstChildElement( u"legend"_s ) );
+  }
+
+  QgsLayerTreeGroup *group = root->findGroupByPath( groupPath );
+  if ( !group || group->customProperty( u"embedded"_s ).toBool() )
+  {
+    // embedded groups cannot be embedded again
+    return nullptr;
+  }
+
+  // clone the group sub-tree (it is used already in a tree, we cannot just tear it off)
+  std::unique_ptr< QgsLayerTreeGroup > newGroup( QgsLayerTree::toGroup( group->clone() ) );
+  root.reset();
+
+  newGroup->setCustomProperty( u"embedded"_s, 1 );
+  newGroup->setCustomProperty( u"embedded_project"_s, projectFilePath );
+
+  // set "embedded" to all children + load embedded layers
+  mLayerTreeRegistryBridge->setEnabled( false );
+  initializeEmbeddedSubtree( projectFilePath, newGroup.get(), flags );
+  mLayerTreeRegistryBridge->setEnabled( true );
+
+  // consider the layers might be identify disabled in its project
+  const QStringList constFindLayerIds = newGroup->findLayerIds();
+  for ( const QString &layerId : constFindLayerIds )
+  {
+    QgsLayerTreeLayer *layer = newGroup->findLayer( layerId );
+    if ( layer )
+    {
+      layer->resolveReferences( this );
+      layer->setItemVisibilityChecked( !invisibleLayers.contains( layerId ) );
+    }
+  }
+
+  return newGroup;
+}
+
 void QgsProject::initializeEmbeddedSubtree( const QString &projectFilePath, QgsLayerTreeGroup *group, Qgis::ProjectReadFlags flags )
 {
   QGIS_PROTECT_QOBJECT_THREAD_ACCESS

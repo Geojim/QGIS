@@ -6732,6 +6732,7 @@ QgsLayerTreeGroup.dump: src/core/layertree/qgslayertreegroup.h#L298
 QgsLayerTreeGroup.findCustomNode: src/core/layertree/qgslayertreegroup.h#L188
 QgsLayerTreeGroup.findCustomNodeIds: src/core/layertree/qgslayertreegroup.h#L260
 QgsLayerTreeGroup.findGroup: src/core/layertree/qgslayertreegroup.h#L265
+QgsLayerTreeGroup.findGroupByPath: src/core/layertree/qgslayertreegroup.h#L279
 QgsLayerTreeGroup.findLayer: src/core/layertree/qgslayertreegroup.h#L169
 QgsLayerTreeGroup.findLayer: src/core/layertree/qgslayertreegroup.h#L174
 QgsLayerTreeGroup.findLayerIds: src/core/layertree/qgslayertreegroup.h#L255
@@ -14002,6 +14003,8 @@ QgsProject.cleared: src/core/project/qgsproject.h#L1863
 QgsProject.commitChanges: src/core/project/qgsproject.h#L2408
 QgsProject.count: src/core/project/qgsproject.h#L1229
 QgsProject.createAttachedFile: src/core/project/qgsproject.h#L1623
+QgsProject.createEmbeddedGroup: src/core/project/qgsproject.h#L765
+QgsProject.createEmbeddedGroup: src/core/project/qgsproject.h#L781
 QgsProject.createEmbeddedLayer: src/core/project/qgsproject.h#L756
 QgsProject.createExpressionContext: src/core/project/qgsproject.h#L1154
 QgsProject.createExpressionContextScope: src/core/project/qgsproject.h#L1155

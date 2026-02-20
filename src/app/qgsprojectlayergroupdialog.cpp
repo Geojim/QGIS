@@ -129,6 +129,42 @@ QStringList QgsProjectLayerGroupDialog::selectedGroups() const
   return groups;
 }
 
+QList<QList<QPair<QString, int>>> QgsProjectLayerGroupDialog::selectedGroupPaths() const
+{
+  QList<QList<QPair<QString, int>>> paths;
+  const auto constSelectedIndexes = mTreeView->selectionModel()->selectedIndexes();
+  for ( const QModelIndex &index : constSelectedIndexes )
+  {
+    QgsLayerTreeNode *node = mTreeView->index2node( index );
+    if ( QgsLayerTree::isGroup( node ) )
+    {
+      QList<QPair<QString, int>> path;
+      QgsLayerTreeNode *current = node;
+      while ( current && current->parent() )
+      {
+        if ( QgsLayerTree::isGroup( current ) )
+        {
+          const QString name = QgsLayerTree::toGroup( current )->name();
+          // Count how many same-named siblings appear before this node
+          int occurrence = 0;
+          QgsLayerTreeNode *parent = current->parent();
+          for ( QgsLayerTreeNode *sibling : parent->children() )
+          {
+            if ( sibling == current )
+              break;
+            if ( QgsLayerTree::isGroup( sibling ) && QgsLayerTree::toGroup( sibling )->name() == name )
+              occurrence++;
+          }
+          path.prepend( qMakePair( name, occurrence ) );
+        }
+        current = current->parent();
+      }
+      paths.append( path );
+    }
+  }
+  return paths;
+}
+
 QStringList QgsProjectLayerGroupDialog::selectedLayerIds() const
 {
   QStringList layerIds;

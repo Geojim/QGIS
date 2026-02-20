@@ -256,6 +256,20 @@ Find group node with specified name. Searches recursively the whole
 sub-tree.
 %End
 
+    QgsLayerTreeGroup *findGroupByPath( const QList<QPair<QString, int>> &path );
+%Docstring
+Find a group node by navigating a hierarchical path from this node.
+
+Each element in the ``path`` is a pair of (group name, occurrence index)
+where the occurrence index is the 0-based position among same-named
+non-embedded sibling groups at each level. This allows unambiguous
+identification of groups even when multiple groups share the same name.
+
+Returns ``None`` if the path cannot be resolved.
+
+.. versionadded:: 3.44
+%End
+
     QList<QgsLayerTreeGroup *> findGroups( bool recursive = false ) const;
 %Docstring
 Find group layer nodes. Searches recursively the whole sub-tree, if

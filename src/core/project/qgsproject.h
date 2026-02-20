@@ -764,6 +764,22 @@ class CORE_EXPORT QgsProject : public QObject, public QgsExpressionContextGenera
      */
     std::unique_ptr< QgsLayerTreeGroup > createEmbeddedGroup( const QString &groupName, const QString &projectFilePath, const QStringList &invisibleLayers,  Qgis::ProjectReadFlags flags = Qgis::ProjectReadFlags() );
 
+    /**
+     * Create layer group instance defined in an arbitrary project file,
+     * identified by a hierarchical path.
+     *
+     * The \a groupPath is a list of (group name, occurrence index) pairs that
+     * describes the path from the root of the layer tree to the target group.
+     * The occurrence index is the 0-based position among same-named non-embedded
+     * sibling groups at each level. This allows unambiguous identification of
+     * groups even when multiple groups share the same name.
+     *
+     * The optional \a flags argument can be used to control layer reading behavior.
+     *
+     * \since QGIS 3.44
+     */
+    std::unique_ptr< QgsLayerTreeGroup > createEmbeddedGroup( const QList<QPair<QString, int>> &groupPath, const QString &projectFilePath, const QStringList &invisibleLayers,  Qgis::ProjectReadFlags flags = Qgis::ProjectReadFlags() );
+
     //! Convenience function to set topological editing
     void setTopologicalEditing( bool enabled );
 

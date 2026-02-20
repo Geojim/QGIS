@@ -474,6 +474,41 @@ QgsLayerTreeGroup *QgsLayerTreeGroup::findGroup( const QString &name )
   return nullptr;
 }
 
+QgsLayerTreeGroup *QgsLayerTreeGroup::findGroupByPath( const QList<QPair<QString, int>> &path )
+{
+  if ( path.isEmpty() )
+    return nullptr;
+
+  QgsLayerTreeGroup *current = this;
+  for ( const auto &[name, occurrence] : path )
+  {
+    int matchCount = 0;
+    QgsLayerTreeGroup *found = nullptr;
+    for ( QgsLayerTreeNode *child : std::as_const( current->mChildren ) )
+    {
+      if ( QgsLayerTree::isGroup( child ) )
+      {
+        QgsLayerTreeGroup *childGroup = QgsLayerTree::toGroup( child );
+        if ( childGroup->customProperty( u"embedded"_s ).toInt() )
+          continue;
+        if ( childGroup->name() == name )
+        {
+          if ( matchCount == occurrence )
+          {
+            found = childGroup;
+            break;
+          }
+          matchCount++;
+        }
+      }
+    }
+    if ( !found )
+      return nullptr;
+    current = found;
+  }
+  return current;
+}
+
 QList<QgsLayerTreeGroup *> QgsLayerTreeGroup::findGroups( bool recursive ) const
 {
   QList<QgsLayerTreeGroup *> list;

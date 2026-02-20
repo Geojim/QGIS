@@ -13358,7 +13358,23 @@ void QgisApp::embedLayers()
   QgsProjectLayerGroupDialog d( this );
   if ( d.exec() == QDialog::Accepted && d.isValid() )
   {
-    addEmbeddedItems( d.selectedProjectFile(), d.selectedGroups(), d.selectedLayerIds() );
+    const QString projectFile = d.selectedProjectFile();
+    const QList<QList<QPair<QString, int>>> groupPaths = d.selectedGroupPaths();
+    const QStringList layerIds = d.selectedLayerIds();
+
+    QgsCanvasRefreshBlocker refreshBlocker;
+
+    // embed groups using paths for accurate identification
+    for ( const QList<QPair<QString, int>> &path : groupPaths )
+    {
+      std::unique_ptr< QgsLayerTreeGroup > newGroup = QgsProject::instance()->createEmbeddedGroup( path, projectFile, QStringList() );
+      if ( newGroup )
+        QgsProject::instance()->layerTreeRoot()->addChildNode( newGroup.release() );
+    }
+
+    // embed layers
+    if ( !layerIds.isEmpty() )
+      addEmbeddedItems( projectFile, QStringList(), layerIds );
   }
 }
 
