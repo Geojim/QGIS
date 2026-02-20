@@ -68,6 +68,7 @@ class TestQgsProject : public QObject
     void testAttachmentsQgz();
     void testAttachmentIdentifier();
     void testEmbeddedGroupWithJoins();
+    void testEmbeddedGroupByPath();
     void testAsynchronousLayerLoading();
     void testSymlinks1LayerRasterChange();
     void testSymlinks2LayerFolder();
@@ -995,6 +996,43 @@ void TestQgsProject::testEmbeddedGroupWithJoins()
 
   QgsVectorLayer *vl = p.mapLayer<QgsVectorLayer *>( u"polys_with_id_32002f94_eebe_40a5_a182_44198ba1bc5a"_s );
   QCOMPARE( vl->fields().count(), 5 );
+}
+
+void TestQgsProject::testEmbeddedGroupByPath()
+{
+  const QString dataDir( TEST_DATA_DIR );
+  const QString layerPath = dataDir + u"/points.shp"_s;
+
+  const QTemporaryDir dir;
+  QVERIFY( dir.isValid() );
+  const QString dirPath = QFileInfo( dir.path() ).canonicalFilePath();
+  const QString projectFilename = dirPath + u"/project.qgs"_s;
+
+  // build source project with two same-named groups
+  //  ├─ MyGroup  (layers: points 1)
+  //  └─ MyGroup  (layers: points 2)
+  QgsVectorLayer *layer1 = new QgsVectorLayer( layerPath, u"points 1"_s, u"ogr"_s );
+  QgsVectorLayer *layer2 = new QgsVectorLayer( layerPath, u"points 2"_s, u"ogr"_s );
+  QVERIFY( layer1->isValid() );
+
+  QgsProject source;
+  source.addMapLayers( { layer1, layer2 }, false );
+  QgsLayerTreeGroup *grp0 = source.layerTreeRoot()->addGroup( u"MyGroup"_s );
+  grp0->addLayer( layer1 );
+  QgsLayerTreeGroup *grp1 = source.layerTreeRoot()->addGroup( u"MyGroup"_s );
+  grp1->addLayer( layer2 );
+  source.write( projectFilename );
+
+  // embed the second "MyGroup" using path
+  QList<QPair<QString, int>> path;
+  path << qMakePair( u"MyGroup"_s, 1 );
+
+  QgsProject target;
+  std::unique_ptr< QgsLayerTreeGroup > embedded = target.createEmbeddedGroup( path, projectFilename, QStringList() );
+  QVERIFY( embedded );
+  QCOMPARE( embedded->name(), u"MyGroup"_s );
+  QCOMPARE( embedded->children().size(), 1 );
+  QVERIFY( QgsLayerTree::toLayer( embedded->children().at( 0 ) )->layer() );
 }
 
 void TestQgsProject::testAsynchronousLayerLoading()

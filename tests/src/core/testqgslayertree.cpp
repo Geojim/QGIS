@@ -67,6 +67,7 @@ class TestQgsLayerTree : public QObject
     void testLayerDeleted();
     void testFindGroups();
     void testFindNestedGroups();
+    void testFindGroupByPath();
     void testCustomNodes();
     void testCustomNodeOrderAndFinding();
     void testCustomNodeDeleted();
@@ -833,6 +834,51 @@ void TestQgsLayerTree::testFindNestedGroups()
   QVERIFY( all.contains( group1 ) );
   QVERIFY( all.contains( group2 ) );
   QVERIFY( all.contains( group3 ) );
+}
+
+void TestQgsLayerTree::testFindGroupByPath()
+{
+  // root
+  //  ├─ A
+  //  │  ├─ B
+  //  │  └─ B   (second occurrence)
+  //  └─ A      (second occurrence)
+  //     └─ C
+  const QgsProject project;
+  QgsLayerTreeGroup *a0 = project.layerTreeRoot()->addGroup( u"A"_s );
+  QgsLayerTreeGroup *b0 = a0->addGroup( u"B"_s );
+  QgsLayerTreeGroup *b1 = a0->addGroup( u"B"_s );
+  QgsLayerTreeGroup *a1 = project.layerTreeRoot()->addGroup( u"A"_s );
+  QgsLayerTreeGroup *c = a1->addGroup( u"C"_s );
+
+  // single-level path
+  QList<QPair<QString, int>> path;
+  path << qMakePair( u"A"_s, 0 );
+  QCOMPARE( project.layerTreeRoot()->findGroupByPath( path ), a0 );
+
+  path.clear();
+  path << qMakePair( u"A"_s, 1 );
+  QCOMPARE( project.layerTreeRoot()->findGroupByPath( path ), a1 );
+
+  // multi-level path with same-named groups
+  path.clear();
+  path << qMakePair( u"A"_s, 0 ) << qMakePair( u"B"_s, 1 );
+  QCOMPARE( project.layerTreeRoot()->findGroupByPath( path ), b1 );
+
+  path.clear();
+  path << qMakePair( u"A"_s, 1 ) << qMakePair( u"C"_s, 0 );
+  QCOMPARE( project.layerTreeRoot()->findGroupByPath( path ), c );
+
+  // invalid paths
+  QVERIFY( !project.layerTreeRoot()->findGroupByPath( {} ) );
+
+  path.clear();
+  path << qMakePair( u"X"_s, 0 );
+  QVERIFY( !project.layerTreeRoot()->findGroupByPath( path ) );
+
+  path.clear();
+  path << qMakePair( u"A"_s, 2 );  // only two A's
+  QVERIFY( !project.layerTreeRoot()->findGroupByPath( path ) );
 }
 
 void TestQgsLayerTree::testCustomNodes()
