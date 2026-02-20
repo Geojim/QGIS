@@ -877,7 +877,7 @@ void TestQgsLayerTree::testFindGroupByPath()
   QVERIFY( !project.layerTreeRoot()->findGroupByPath( path ) );
 
   path.clear();
-  path << qMakePair( u"A"_s, 2 );  // only two A's
+  path << qMakePair( u"A"_s, 2 ); // only two A's
   QVERIFY( !project.layerTreeRoot()->findGroupByPath( path ) );
 }
 

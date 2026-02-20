@@ -778,7 +778,7 @@ class CORE_EXPORT QgsProject : public QObject, public QgsExpressionContextGenera
      *
      * \since QGIS 3.44
      */
-    std::unique_ptr< QgsLayerTreeGroup > createEmbeddedGroup( const QList<QPair<QString, int>> &groupPath, const QString &projectFilePath, const QStringList &invisibleLayers,  Qgis::ProjectReadFlags flags = Qgis::ProjectReadFlags() );
+    std::unique_ptr< QgsLayerTreeGroup > createEmbeddedGroup( const QList<QPair<QString, int>> &groupPath, const QString &projectFilePath, const QStringList &invisibleLayers, Qgis::ProjectReadFlags flags = Qgis::ProjectReadFlags() );
 
     //! Convenience function to set topological editing
     void setTopologicalEditing( bool enabled );
