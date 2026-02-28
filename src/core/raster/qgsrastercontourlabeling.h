@@ -97,18 +97,6 @@ class CORE_EXPORT QgsRasterLayerContourLabeling : public QgsAbstractRasterLayerL
     const QgsNumericFormat *numericFormat() const;
     void setNumericFormat( QgsNumericFormat *format SIP_TRANSFER );
 
-    int band() const { return mBandNumber; }
-    void setBand( int band ) { mBandNumber = band; }
-
-    double contourInterval() const { return mContourInterval; }
-    void setContourInterval( double interval ) { mContourInterval = interval; }
-
-    double contourIndexInterval() const { return mContourIndexInterval; }
-    void setContourIndexInterval( double interval ) { mContourIndexInterval = interval; }
-
-    double downscale() const { return mDownscale; }
-    void setDownscale( double downscale ) { mDownscale = downscale; }
-
     bool labelIndexOnly() const { return mLabelIndexOnly; }
     void setLabelIndexOnly( bool indexOnly ) { mLabelIndexOnly = indexOnly; }
 
@@ -136,10 +124,6 @@ class CORE_EXPORT QgsRasterLayerContourLabeling : public QgsAbstractRasterLayerL
     bool hasScaleBasedVisibility() const;
 
   private:
-    int mBandNumber = 1;
-    double mContourInterval = 100.0;
-    double mContourIndexInterval = 0.0;
-    double mDownscale = 4.0;
     bool mLabelIndexOnly = false;
 
     QgsTextFormat mTextFormat;

@@ -58,18 +58,6 @@ configuration
     const QgsNumericFormat *numericFormat() const;
     void setNumericFormat( QgsNumericFormat *format /Transfer/ );
 
-    int band() const;
-    void setBand( int band );
-
-    double contourInterval() const;
-    void setContourInterval( double interval );
-
-    double contourIndexInterval() const;
-    void setContourIndexInterval( double interval );
-
-    double downscale() const;
-    void setDownscale( double downscale );
-
     bool labelIndexOnly() const;
     void setLabelIndexOnly( bool indexOnly );
 

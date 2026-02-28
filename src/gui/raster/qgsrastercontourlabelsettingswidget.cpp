@@ -16,10 +16,9 @@
 #include "qgsrastercontourlabelsettingswidget.h"
 
 #include "qgsbasicnumericformat.h"
-#include "qgsdoublespinbox.h"
 #include "qgsnumericformatselectorwidget.h"
-#include "qgsrasterbandcombobox.h"
 #include "qgsrastercontourlabeling.h"
+#include "qgsrasterlayer.h"
 
 #include <QCheckBox>
 #include <QLabel>
@@ -40,56 +39,16 @@ QgsRasterContourLabelSettingsWidget::QgsRasterContourLabelSettingsWidget( QgsRas
   QGridLayout *gLayout = new QGridLayout();
   gLayout->setContentsMargins( 0, 0, 0, 0 );
 
-  // Row 0: Band
-  gLayout->addWidget( new QLabel( tr( "Band" ) ), 0, 0 );
-  mBandCombo = new QgsRasterBandComboBox();
-  mBandCombo->setLayer( layer );
-  gLayout->addWidget( mBandCombo, 0, 1 );
-
-  // Row 1: Contour interval
-  gLayout->addWidget( new QLabel( tr( "Contour interval" ) ), 1, 0 );
-  mContourIntervalSpin = new QgsDoubleSpinBox();
-  mContourIntervalSpin->setMinimum( 0.001 );
-  mContourIntervalSpin->setMaximum( 999999999.0 );
-  mContourIntervalSpin->setDecimals( 3 );
-  mContourIntervalSpin->setValue( 100.0 );
-  mContourIntervalSpin->setClearValue( 100.0 );
-  connect( mContourIntervalSpin, qOverload<double>( &QgsDoubleSpinBox::valueChanged ), this, &QgsRasterContourLabelSettingsWidget::widgetChanged );
-  gLayout->addWidget( mContourIntervalSpin, 1, 1 );
-
-  // Row 2: Index interval
-  gLayout->addWidget( new QLabel( tr( "Index interval" ) ), 2, 0 );
-  mContourIndexIntervalSpin = new QgsDoubleSpinBox();
-  mContourIndexIntervalSpin->setMinimum( 0.0 );
-  mContourIndexIntervalSpin->setMaximum( 999999999.0 );
-  mContourIndexIntervalSpin->setDecimals( 3 );
-  mContourIndexIntervalSpin->setValue( 0.0 );
-  mContourIndexIntervalSpin->setClearValue( 0.0 );
-  mContourIndexIntervalSpin->setSpecialValueText( tr( "None" ) );
-  connect( mContourIndexIntervalSpin, qOverload<double>( &QgsDoubleSpinBox::valueChanged ), this, &QgsRasterContourLabelSettingsWidget::widgetChanged );
-  gLayout->addWidget( mContourIndexIntervalSpin, 2, 1 );
-
-  // Row 3: Downscale
-  gLayout->addWidget( new QLabel( tr( "Downscale" ) ), 3, 0 );
-  mDownscaleSpin = new QgsDoubleSpinBox();
-  mDownscaleSpin->setMinimum( 1.0 );
-  mDownscaleSpin->setMaximum( 16.0 );
-  mDownscaleSpin->setDecimals( 1 );
-  mDownscaleSpin->setValue( 4.0 );
-  mDownscaleSpin->setClearValue( 4.0 );
-  connect( mDownscaleSpin, qOverload<double>( &QgsDoubleSpinBox::valueChanged ), this, &QgsRasterContourLabelSettingsWidget::widgetChanged );
-  gLayout->addWidget( mDownscaleSpin, 3, 1 );
-
-  // Row 4: Number format
-  gLayout->addWidget( new QLabel( tr( "Number format" ) ), 4, 0 );
+  // Row 0: Number format
+  gLayout->addWidget( new QLabel( tr( "Number format" ) ), 0, 0 );
   QPushButton *numberFormatButton = new QPushButton( tr( "Customize" ) );
   connect( numberFormatButton, &QPushButton::clicked, this, &QgsRasterContourLabelSettingsWidget::changeNumberFormat );
-  gLayout->addWidget( numberFormatButton, 4, 1 );
+  gLayout->addWidget( numberFormatButton, 0, 1 );
 
-  // Row 5: Label index contours only
+  // Row 1: Label index contours only
   mLabelIndexOnlyCheck = new QCheckBox( tr( "Label index contours only" ) );
   connect( mLabelIndexOnlyCheck, &QCheckBox::toggled, this, &QgsRasterContourLabelSettingsWidget::widgetChanged );
-  gLayout->addWidget( mLabelIndexOnlyCheck, 5, 0, 1, 2 );
+  gLayout->addWidget( mLabelIndexOnlyCheck, 1, 0, 1, 2 );
 
   gLayout->setColumnStretch( 0, 1 );
   gLayout->setColumnStretch( 1, 2 );
@@ -183,7 +142,6 @@ QgsRasterContourLabelSettingsWidget::QgsRasterContourLabelSettingsWidget( QgsRas
   mPrioritySlider->setRange( 0, 100 );
   mPrioritySlider->setTickInterval( 10 );
 
-  connect( mBandCombo, &QgsRasterBandComboBox::bandChanged, this, &QgsRasterContourLabelSettingsWidget::widgetChanged );
 }
 
 QgsRasterContourLabelSettingsWidget::~QgsRasterContourLabelSettingsWidget() = default;
@@ -193,10 +151,6 @@ void QgsRasterContourLabelSettingsWidget::setLabeling( QgsAbstractRasterLayerLab
   if ( QgsRasterLayerContourLabeling *contourLabeling = dynamic_cast<QgsRasterLayerContourLabeling *>( labeling ) )
   {
     setFormat( contourLabeling->textFormat() );
-    mBandCombo->setBand( contourLabeling->band() );
-    mContourIntervalSpin->setValue( contourLabeling->contourInterval() );
-    mContourIndexIntervalSpin->setValue( contourLabeling->contourIndexInterval() );
-    mDownscaleSpin->setValue( contourLabeling->downscale() );
     mLabelIndexOnlyCheck->setChecked( contourLabeling->labelIndexOnly() );
     mPrioritySlider->setValue( static_cast<int>( 100 - contourLabeling->priority() * 100 ) );
 
@@ -222,10 +176,6 @@ void QgsRasterContourLabelSettingsWidget::updateLabeling( QgsAbstractRasterLayer
   if ( QgsRasterLayerContourLabeling *contourLabeling = dynamic_cast<QgsRasterLayerContourLabeling *>( labeling ) )
   {
     contourLabeling->setTextFormat( format() );
-    contourLabeling->setBand( mBandCombo->currentBand() );
-    contourLabeling->setContourInterval( mContourIntervalSpin->value() );
-    contourLabeling->setContourIndexInterval( mContourIndexIntervalSpin->value() );
-    contourLabeling->setDownscale( mDownscaleSpin->value() );
     contourLabeling->setLabelIndexOnly( mLabelIndexOnlyCheck->isChecked() );
     contourLabeling->setPriority( 1.0 - mPrioritySlider->value() / 100.0 );
     contourLabeling->placementSettings().setOverlapHandling( static_cast<Qgis::LabelOverlapHandling>( mComboOverlapHandling->currentData().toInt() ) );
@@ -244,9 +194,6 @@ void QgsRasterContourLabelSettingsWidget::updateLabeling( QgsAbstractRasterLayer
 
 void QgsRasterContourLabelSettingsWidget::setLayer( QgsMapLayer *layer )
 {
-  if ( mBandCombo )
-    mBandCombo->setLayer( layer );
-
   QgsLabelingGui::setLayer( layer );
   mMinSizeFrame->show();
 }

@@ -15,6 +15,7 @@
  ***************************************************************************/
 
 #include "qgsrastercontourlabeling.h"
+#include "qgsrastercontourrenderer.h"
 
 #include <gdal_alg.h>
 
@@ -256,10 +257,6 @@ QgsRasterLayerContourLabeling *QgsRasterLayerContourLabeling::clone() const
   if ( mNumericFormat )
     res->mNumericFormat.reset( mNumericFormat->clone() );
 
-  res->setBand( mBandNumber );
-  res->setContourInterval( mContourInterval );
-  res->setContourIndexInterval( mContourIndexInterval );
-  res->setDownscale( mDownscale );
   res->setLabelIndexOnly( mLabelIndexOnly );
   res->setPriority( mPriority );
   res->setPlacementSettings( mPlacementSettings );
@@ -276,10 +273,6 @@ std::unique_ptr<QgsRasterLayerLabelProvider> QgsRasterLayerContourLabeling::prov
 {
   auto res = std::make_unique<QgsRasterContourLabelProvider>( layer );
   res->setTextFormat( mTextFormat );
-  res->setInputBand( mBandNumber );
-  res->setContourInterval( mContourInterval );
-  res->setContourIndexInterval( mContourIndexInterval );
-  res->setDownscale( mDownscale );
   res->setLabelIndexOnly( mLabelIndexOnly );
   res->setPriority( mPriority );
   res->setPlacementSettings( mPlacementSettings );
@@ -289,6 +282,16 @@ std::unique_ptr<QgsRasterLayerLabelProvider> QgsRasterLayerContourLabeling::prov
   {
     res->setNumericFormat( std::unique_ptr<QgsNumericFormat>( mNumericFormat->clone() ) );
   }
+
+  // Read contour parameters from the renderer so they stay in sync with the Symbology tab
+  if ( const QgsRasterContourRenderer *renderer = dynamic_cast<const QgsRasterContourRenderer *>( layer->renderer() ) )
+  {
+    res->setInputBand( renderer->inputBand() );
+    res->setContourInterval( renderer->contourInterval() );
+    res->setContourIndexInterval( renderer->contourIndexInterval() );
+    res->setDownscale( renderer->downscale() );
+  }
+
   return res;
 }
 
@@ -296,10 +299,6 @@ QDomElement QgsRasterLayerContourLabeling::save( QDomDocument &doc, const QgsRea
 {
   QDomElement elem = doc.createElement( u"labeling"_s );
   elem.setAttribute( u"type"_s, u"contour"_s );
-  elem.setAttribute( u"band"_s, mBandNumber );
-  elem.setAttribute( u"contourInterval"_s, mContourInterval );
-  elem.setAttribute( u"contourIndexInterval"_s, mContourIndexInterval );
-  elem.setAttribute( u"downscale"_s, mDownscale );
   elem.setAttribute( u"labelIndexOnly"_s, mLabelIndexOnly ? 1 : 0 );
   elem.setAttribute( u"priority"_s, mPriority );
   elem.setAttribute( u"zIndex"_s, mZIndex );
@@ -375,10 +374,6 @@ bool QgsRasterLayerContourLabeling::isInScaleRange( double scale ) const
 QgsRasterLayerContourLabeling *QgsRasterLayerContourLabeling::create( const QDomElement &element, const QgsReadWriteContext &context )
 {
   auto res = std::make_unique<QgsRasterLayerContourLabeling>();
-  res->setBand( element.attribute( u"band"_s, u"1"_s ).toInt() );
-  res->setContourInterval( element.attribute( u"contourInterval"_s, u"100"_s ).toDouble() );
-  res->setContourIndexInterval( element.attribute( u"contourIndexInterval"_s, u"0"_s ).toDouble() );
-  res->setDownscale( element.attribute( u"downscale"_s, u"4"_s ).toDouble() );
   res->setLabelIndexOnly( element.attribute( u"labelIndexOnly"_s, u"0"_s ).toInt() );
   res->setPriority( element.attribute( u"priority"_s, u"0.5"_s ).toDouble() );
   res->setZIndex( element.attribute( u"zIndex"_s, u"0"_s ).toDouble() );

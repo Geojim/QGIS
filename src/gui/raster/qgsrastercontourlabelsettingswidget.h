@@ -22,9 +22,7 @@
 
 class QgsRasterLayer;
 class QgsAbstractRasterLayerLabeling;
-class QgsRasterBandComboBox;
 class QgsNumericFormat;
-class QgsDoubleSpinBox;
 class QCheckBox;
 
 // We don't want to expose this in the public API
@@ -62,10 +60,6 @@ class GUI_EXPORT QgsRasterContourLabelSettingsWidget : public QgsLabelingGui
     void changeNumberFormat();
 
   private:
-    QgsRasterBandComboBox *mBandCombo = nullptr;
-    QgsDoubleSpinBox *mContourIntervalSpin = nullptr;
-    QgsDoubleSpinBox *mContourIndexIntervalSpin = nullptr;
-    QgsDoubleSpinBox *mDownscaleSpin = nullptr;
     QCheckBox *mLabelIndexOnlyCheck = nullptr;
     std::unique_ptr<QgsNumericFormat> mNumberFormat;
     int mBlockChangesSignal = 0;
