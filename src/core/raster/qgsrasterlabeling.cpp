@@ -15,7 +15,6 @@
  ***************************************************************************/
 
 #include "qgsrasterlabeling.h"
-#include "qgsrastercontourlabeling.h"
 
 #include "feature.h"
 #include "labelposition.h"
@@ -24,6 +23,7 @@
 #include "qgsmessagelog.h"
 #include "qgsnumericformat.h"
 #include "qgsnumericformatregistry.h"
+#include "qgsrastercontourlabeling.h"
 #include "qgsrasterlayer.h"
 #include "qgsrasterlayerrenderer.h"
 #include "qgsrasterpipe.h"

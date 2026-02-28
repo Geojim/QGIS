@@ -15,7 +15,6 @@
  ***************************************************************************/
 
 #include "qgsrastercontourlabeling.h"
-#include "qgsrastercontourrenderer.h"
 
 #include <gdal_alg.h>
 
@@ -27,6 +26,7 @@
 #include "qgsmessagelog.h"
 #include "qgsnumericformat.h"
 #include "qgsnumericformatregistry.h"
+#include "qgsrastercontourrenderer.h"
 #include "qgsrasterdataprovider.h"
 #include "qgsrasteriterator.h"
 #include "qgsrasterlayer.h"
@@ -60,7 +60,7 @@ struct ContourLabelData
   bool labelIndexOnly;
 };
 
-static CPLErr _contourLabelWriter( double dfLevel, int nPoints, double *padfX, double *padfY, void *ptr )
+static CPLErr contourLabelWriter( double dfLevel, int nPoints, double *padfX, double *padfY, void *ptr )
 {
   ContourLabelData *data = static_cast<ContourLabelData *>( ptr );
 
@@ -217,7 +217,7 @@ void QgsRasterContourLabelProvider::generateLabels( QgsRenderContext &context, Q
   GDALContourGeneratorH cg = GDAL_CG_Create( inputWidth, inputHeight,
                              inputBlock->hasNoDataValue(), inputBlock->noDataValue(),
                              mContourInterval, contourBase,
-                             _contourLabelWriter, static_cast<void *>( &clData ) );
+                             contourLabelWriter, static_cast<void *>( &clData ) );
 
   for ( int i = 0; i < inputHeight; ++i )
   {
@@ -366,9 +366,11 @@ void QgsRasterLayerContourLabeling::multiplyOpacity( double opacityFactor )
 
 bool QgsRasterLayerContourLabeling::isInScaleRange( double scale ) const
 {
+  // mMaximumScale (most zoomed in) is exclusive ( < --> In range )
+  // mMinimumScale (most zoomed out) is inclusive ( >= --> In range )
   return !mScaleVisibility
-         || ( ( mMinimumScale == 0 || !QgsScaleUtils::lessThanMaximumScale( scale, mMinimumScale ) )
-              && ( mMaximumScale == 0 || !QgsScaleUtils::equalToOrGreaterThanMinimumScale( scale, mMaximumScale ) ) );
+         || ( ( mMinimumScale == 0 || !QgsScaleUtils::equalToOrGreaterThanMinimumScale( scale, mMinimumScale ) )
+              && ( mMaximumScale == 0 || !QgsScaleUtils::lessThanMaximumScale( scale, mMaximumScale ) ) );
 }
 
 QgsRasterLayerContourLabeling *QgsRasterLayerContourLabeling::create( const QDomElement &element, const QgsReadWriteContext &context )

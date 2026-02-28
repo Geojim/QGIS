@@ -141,7 +141,6 @@ QgsRasterContourLabelSettingsWidget::QgsRasterContourLabelSettingsWidget( QgsRas
   // fix precision for priority slider
   mPrioritySlider->setRange( 0, 100 );
   mPrioritySlider->setTickInterval( 10 );
-
 }
 
 QgsRasterContourLabelSettingsWidget::~QgsRasterContourLabelSettingsWidget() = default;

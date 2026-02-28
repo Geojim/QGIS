@@ -669,6 +669,7 @@
 %Include auto_generated/raster/qgsrasterbandstats.sip
 %Include auto_generated/raster/qgsrasterblock.sip
 %Include auto_generated/raster/qgsrasterchecker.sip
+%Include auto_generated/raster/qgsrastercontourlabeling.sip
 %Include auto_generated/raster/qgsrastercontourrenderer.sip
 %Include auto_generated/raster/qgsrasterdataprovider.sip
 %Include auto_generated/raster/qgsrasterdataproviderelevationproperties.sip
@@ -680,7 +681,6 @@
 %Include auto_generated/raster/qgsrasteridentifyresult.sip
 %Include auto_generated/raster/qgsrasterinterface.sip
 %Include auto_generated/raster/qgsrasteriterator.sip
-%Include auto_generated/raster/qgsrastercontourlabeling.sip
 %Include auto_generated/raster/qgsrasterlabeling.sip
 %Include auto_generated/raster/qgsrasterlayer.sip
 %Include auto_generated/raster/qgsrasterlayerelevationproperties.sip

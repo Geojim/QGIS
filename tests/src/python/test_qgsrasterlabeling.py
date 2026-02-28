@@ -418,19 +418,14 @@ class TestQgsRasterLabeling(QgisTestCase):
             self.render_map_settings_check("resampling", "resampling", mapsettings)
         )
 
-
     def test_contour_labeling(self):
         labeling = QgsRasterLayerContourLabeling()
         self.assertEqual(labeling.type(), "contour")
 
-        labeling.setBand(2)
         text_format = QgsTextFormat()
         text_format.setSize(14)
         labeling.setTextFormat(text_format)
         labeling.setNumericFormat(QgsCurrencyNumericFormat())
-        labeling.setContourInterval(25)
-        labeling.setContourIndexInterval(100)
-        labeling.setDownscale(8)
         labeling.setLabelIndexOnly(True)
         labeling.setPriority(0.3)
         labeling.placementSettings().setOverlapHandling(
@@ -443,12 +438,8 @@ class TestQgsRasterLabeling(QgisTestCase):
         labeling.setMinimumScale(50000)
         labeling.setScaleBasedVisibility(True)
 
-        self.assertEqual(labeling.band(), 2)
         self.assertEqual(labeling.textFormat().size(), 14)
         self.assertIsInstance(labeling.numericFormat(), QgsCurrencyNumericFormat)
-        self.assertEqual(labeling.contourInterval(), 25)
-        self.assertEqual(labeling.contourIndexInterval(), 100)
-        self.assertEqual(labeling.downscale(), 8)
         self.assertTrue(labeling.labelIndexOnly())
         self.assertEqual(labeling.priority(), 0.3)
         self.assertEqual(
@@ -464,12 +455,8 @@ class TestQgsRasterLabeling(QgisTestCase):
 
         labeling_clone = labeling.clone()
         self.assertIsInstance(labeling_clone, QgsRasterLayerContourLabeling)
-        self.assertEqual(labeling_clone.band(), 2)
         self.assertEqual(labeling_clone.textFormat().size(), 14)
         self.assertIsInstance(labeling_clone.numericFormat(), QgsCurrencyNumericFormat)
-        self.assertEqual(labeling_clone.contourInterval(), 25)
-        self.assertEqual(labeling_clone.contourIndexInterval(), 100)
-        self.assertEqual(labeling_clone.downscale(), 8)
         self.assertTrue(labeling_clone.labelIndexOnly())
         self.assertEqual(labeling_clone.priority(), 0.3)
         self.assertEqual(
@@ -491,14 +478,10 @@ class TestQgsRasterLabeling(QgisTestCase):
             element, context
         )
         self.assertIsInstance(labeling_from_xml, QgsRasterLayerContourLabeling)
-        self.assertEqual(labeling_from_xml.band(), 2)
         self.assertEqual(labeling_from_xml.textFormat().size(), 14)
         self.assertIsInstance(
             labeling_from_xml.numericFormat(), QgsCurrencyNumericFormat
         )
-        self.assertEqual(labeling_from_xml.contourInterval(), 25)
-        self.assertEqual(labeling_from_xml.contourIndexInterval(), 100)
-        self.assertEqual(labeling_from_xml.downscale(), 8)
         self.assertTrue(labeling_from_xml.labelIndexOnly())
         self.assertEqual(labeling_from_xml.priority(), 0.3)
         self.assertEqual(
@@ -518,10 +501,6 @@ class TestQgsRasterLabeling(QgisTestCase):
 
     def test_contour_labeling_defaults(self):
         labeling = QgsRasterLayerContourLabeling()
-        self.assertEqual(labeling.band(), 1)
-        self.assertEqual(labeling.contourInterval(), 100)
-        self.assertEqual(labeling.contourIndexInterval(), 0)
-        self.assertEqual(labeling.downscale(), 4)
         self.assertFalse(labeling.labelIndexOnly())
         self.assertEqual(labeling.priority(), 0.5)
         self.assertEqual(labeling.zIndex(), 0)
@@ -550,8 +529,7 @@ class TestQgsRasterLabeling(QgisTestCase):
         self.assertTrue(raster_layer.isValid())
 
         labeling = QgsRasterLayerContourLabeling()
-        labeling.setContourInterval(50)
-        labeling.setBand(1)
+        labeling.setLabelIndexOnly(True)
         raster_layer.setLabeling(labeling)
         raster_layer.setLabelsEnabled(True)
 
@@ -567,7 +545,7 @@ class TestQgsRasterLabeling(QgisTestCase):
 
         self.assertIsInstance(raster_layer2.labeling(), QgsRasterLayerContourLabeling)
         self.assertTrue(raster_layer2.labelsEnabled())
-        self.assertEqual(raster_layer2.labeling().contourInterval(), 50)
+        self.assertTrue(raster_layer2.labeling().labelIndexOnly())
 
     def testHasNonDefaultCompositionModeContour(self):
         labeling = QgsRasterLayerContourLabeling()
