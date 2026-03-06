@@ -331,7 +331,7 @@ QDomElement QgsRasterLayerContourLabeling::save( QDomDocument &doc, const QgsRea
   {
     QDomElement renderingElem = doc.createElement( u"rendering"_s );
     renderingElem.setAttribute( u"scaleVisibility"_s, mScaleVisibility );
-    // element names flipped vs member — matches vector labeling convention
+    // note the element names are "flipped" vs the member -- this is intentional, and done to match vector labeling
     renderingElem.setAttribute( u"scaleMin"_s, mMaximumScale );
     renderingElem.setAttribute( u"scaleMax"_s, mMinimumScale );
     elem.appendChild( renderingElem );
