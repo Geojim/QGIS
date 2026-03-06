@@ -23,6 +23,7 @@
 #include "qgsmessagelog.h"
 #include "qgsnumericformat.h"
 #include "qgsnumericformatregistry.h"
+#include "qgsrastercontourlabeling.h"
 #include "qgsrasterlayer.h"
 #include "qgsrasterlayerrenderer.h"
 #include "qgsrasterpipe.h"
@@ -314,6 +315,10 @@ QgsAbstractRasterLayerLabeling *QgsAbstractRasterLayerLabeling::createFromElemen
   if ( type == "simple"_L1 )
   {
     return QgsRasterLayerSimpleLabeling::create( element, context );
+  }
+  else if ( type == "contour"_L1 )
+  {
+    return QgsRasterLayerContourLabeling::create( element, context );
   }
   else
   {

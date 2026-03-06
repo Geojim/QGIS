@@ -1,0 +1,170 @@
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * src/core/raster/qgsrastercontourlabeling.h                           *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
+
+
+
+
+
+class QgsRasterLayerContourLabeling : QgsAbstractRasterLayerLabeling
+{
+%Docstring(signature="appended")
+Labeling configuration for raster contour lines.
+
+Produces labels placed along contour lines generated on-the-fly from
+raster data.
+
+.. versionadded:: 3.44
+%End
+
+%TypeHeaderCode
+#include "qgsrastercontourlabeling.h"
+%End
+  public:
+
+    QgsRasterLayerContourLabeling();
+    ~QgsRasterLayerContourLabeling();
+
+    virtual QString type() const;
+
+    virtual QgsRasterLayerContourLabeling *clone() const /Factory/;
+
+    virtual QDomElement save( QDomDocument &doc, const QgsReadWriteContext &context ) const;
+
+    virtual bool accept( QgsStyleEntityVisitorInterface *visitor ) const;
+
+    virtual bool requiresAdvancedEffects() const;
+
+    virtual bool hasNonDefaultCompositionMode() const;
+
+    virtual void multiplyOpacity( double opacityFactor );
+
+    virtual bool isInScaleRange( double scale ) const;
+
+
+    static QgsRasterLayerContourLabeling *create( const QDomElement &element, const QgsReadWriteContext &context ) /Factory/;
+%Docstring
+Creates a QgsRasterLayerContourLabeling from a DOM element with saved
+configuration.
+%End
+
+    QgsTextFormat textFormat() const;
+%Docstring
+Returns the text format used for rendering contour labels.
+%End
+
+    void setTextFormat( const QgsTextFormat &format );
+%Docstring
+Sets the text ``format`` used for rendering contour labels.
+%End
+
+    const QgsNumericFormat *numericFormat() const;
+%Docstring
+Returns the numeric format used for formatting contour elevation values.
+%End
+
+    void setNumericFormat( QgsNumericFormat *format /Transfer/ );
+%Docstring
+Sets the numeric ``format`` used for formatting contour elevation
+values. Ownership is transferred.
+%End
+
+    bool labelIndexOnly() const;
+%Docstring
+Returns whether only index contours are labeled.
+%End
+
+    void setLabelIndexOnly( bool indexOnly );
+%Docstring
+Sets whether only index contours should be labeled.
+%End
+
+    double priority() const;
+%Docstring
+Returns the label priority, where 0 is lowest and 1 is highest.
+%End
+
+    void setPriority( double priority );
+%Docstring
+Sets the label ``priority``, where 0 is lowest and 1 is highest.
+%End
+
+
+    QgsLabelPlacementSettings &placementSettings();
+%Docstring
+Returns the label placement settings.
+%End
+
+    void setPlacementSettings( const QgsLabelPlacementSettings &settings );
+%Docstring
+Sets the label placement ``settings``.
+%End
+
+
+    QgsLabelThinningSettings &thinningSettings();
+%Docstring
+Returns the label thinning settings.
+%End
+
+    void setThinningSettings( const QgsLabelThinningSettings &settings );
+%Docstring
+Sets the label thinning ``settings``.
+%End
+
+    double zIndex() const;
+%Docstring
+Returns the z-index for label rendering order.
+%End
+
+    void setZIndex( double index );
+%Docstring
+Sets the z-``index`` for label rendering order.
+%End
+
+    double maximumScale() const;
+%Docstring
+Returns the maximum map scale (most zoomed in) at which labels are
+visible.
+%End
+
+    void setMaximumScale( double scale );
+%Docstring
+Sets the maximum map ``scale`` (most zoomed in) at which labels are
+visible.
+%End
+
+    double minimumScale() const;
+%Docstring
+Returns the minimum map scale (most zoomed out) at which labels are
+visible.
+%End
+
+    void setMinimumScale( double scale );
+%Docstring
+Sets the minimum map ``scale`` (most zoomed out) at which labels are
+visible.
+%End
+
+    void setScaleBasedVisibility( bool enabled );
+%Docstring
+Sets whether scale-based visibility is ``enabled`` for labels.
+%End
+
+    bool hasScaleBasedVisibility() const;
+%Docstring
+Returns whether scale-based visibility is enabled for labels.
+%End
+
+};
+
+/************************************************************************
+ * This file has been generated automatically from                      *
+ *                                                                      *
+ * src/core/raster/qgsrastercontourlabeling.h                           *
+ *                                                                      *
+ * Do not edit manually ! Edit header and run scripts/sipify.py again   *
+ ************************************************************************/
